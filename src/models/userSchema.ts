@@ -4,7 +4,7 @@ import mongoose, { Schema ,Document} from "mongoose";
 
 export interface User extends Document{
     email:string;
-    name:string;
+   
     password:string;
     role: "principal" | "teacher" | "student";
     classroomId?: mongoose.Schema.Types.ObjectId;
@@ -18,9 +18,7 @@ const UserSchema:Schema<User>=new mongoose.Schema({
         unique:true,
         match:[/.+\@.+\..+/,'please enter valid email address']
     },
-    name:{
-        type:String
-    },
+   
     password:{
         type:String,
         required:true
