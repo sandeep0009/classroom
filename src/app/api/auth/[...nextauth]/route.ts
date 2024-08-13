@@ -9,14 +9,17 @@ const authOptions:NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text", placeholder: "Enter your email" },
+        email: { label: "Email", type: "email", placeholder: "Enter your email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials: any): Promise<any> {
+      async authorize(credentials:any): Promise<any> {
         await dbConnect();
         try {
+          console.log(credentials.email)
         
           const user = await userModel.findOne({ email: credentials.email });
+          console.log(user)
+          
 
           if (!user) {
             return null; 
@@ -57,6 +60,9 @@ const authOptions:NextAuthOptions = {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  pages:{
+    signIn: '/signin'
+  }
 };
 
 const handler = NextAuth(authOptions);

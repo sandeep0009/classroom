@@ -1,37 +1,41 @@
-import { dbConnect } from "@/lib/dbConnect"
+import { dbConnect } from "@/lib/dbConnect";
 import userModel from "@/models/userSchema";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
-
-export async function POST(req:Request){
+export async function POST(req: Request) {
     try {
         await dbConnect();
-        const data=await req.json();
+        const data = await req.json();
 
-        const userExist=await userModel.find({email:data.email})
+    
+        const { email, password, role } = data;
 
-        if(userExist){
-            return NextResponse.json({message:"already existing email"},{status:404})
+        if (!email || !password || !role) {
+            return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
         }
 
-        const hashedPassword=await bcrypt.hash(data.password,10);
+   
+        const userExist = await userModel.findOne({ email });
 
-        const newUser=await userModel.create({
-            data:{
-                email:data.email,
-                password:hashedPassword,
-                role:data.role
+        if (userExist) {
+            return NextResponse.json({ message: "Email already exists" }, { status: 409 });
+        }
 
-            }
-        })
+      
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        await newUser.save();
-        return NextResponse.json({message:"successfully created",newUser},{status:201});
+     
+        const newUser = await userModel.create({
+            email,
+            password: hashedPassword,
+            role
+        });
+
+        return NextResponse.json({ message: "User successfully created", newUser }, { status: 201 });
         
     } catch (error) {
-        console.log("Error in the post route of signin",error)
-        return NextResponse.json({message:"error in signin"},{status:404})
-        
+        console.error("Error in the POST route for signup", error);
+        return NextResponse.json({ message: "Error in signup" }, { status: 500 });
     }
 }

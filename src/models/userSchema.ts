@@ -14,19 +14,18 @@ export interface User extends Document{
 const UserSchema:Schema<User>=new mongoose.Schema({
     email:{
         type:String,
-        required:true,
+       
         unique:true,
         match:[/.+\@.+\..+/,'please enter valid email address']
     },
    
     password:{
         type:String,
-        required:true
+        
     },
     role:{
         type:String,
-        enum:["principal","student","teacher"],
-        required:true
+        enum:["principal","student","teacher"]
     },
     classroomId:{
         type: mongoose.Schema.Types.ObjectId, 
