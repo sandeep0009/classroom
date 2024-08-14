@@ -143,20 +143,20 @@ const Page = () => {
     <Table className="w-full border-collapse">
         <TableHeader>
             <TableRow>
-                <TableHead className="border p-2 font-bold">Day</TableHead>
-                <TableHead className="border p-2 font-bold">Subject</TableHead>
-                <TableHead className="border p-2 font-bold">Start Time</TableHead>
-                <TableHead className="border p-2 font-bold">End Time</TableHead>
+                <TableHead>Day</TableHead>
+                <TableHead>Subject</TableHead>
+                <TableHead>Start Time</TableHead>
+                <TableHead>End Time</TableHead>
             </TableRow>
         </TableHeader>
         <TableBody>
             {entries.length > 0 ? (
                 entries.map((entry, index) => (
                     <TableRow key={index}>
-                        <TableCell className="border p-2">{entry.day}</TableCell>
-                        <TableCell className="border p-2">{entry.subject}</TableCell>
-                        <TableCell className="border p-2">{entry.startTime}</TableCell>
-                        <TableCell className="border p-2">{entry.endTime}</TableCell>
+                        <TableCell>{entry.day}</TableCell>
+                        <TableCell>{entry.subject}</TableCell>
+                        <TableCell>{entry.startTime}</TableCell>
+                        <TableCell>{entry.endTime}</TableCell>
                     </TableRow>
                 ))
             ) : (
