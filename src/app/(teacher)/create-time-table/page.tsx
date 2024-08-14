@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState, useEffect } from 'react';
 import {
     Table,
@@ -7,12 +7,11 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-  } from "@/components/ui/table"
-  import { Input } from '@/components/ui/input';
-  import { Button } from '@/components/ui/button';
+} from "@/components/ui/table";
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { axiosInstance } from '@/lib/axiosInstance';
 import { useSession } from 'next-auth/react';
-
 
 const parseTime = (timeStr: string) => {
     const [time, period] = timeStr.split(/(AM|PM)/);
@@ -21,9 +20,8 @@ const parseTime = (timeStr: string) => {
     return new Date(0, 0, 0, adjustedHours, minutes);
 };
 
-
 const getTimeDifference = (start: Date, end: Date) => {
-    return Math.floor((end.getTime() - start.getTime()) / (1000 * 60)); 
+    return Math.floor((end.getTime() - start.getTime()) / (1000 * 60));
 };
 
 interface Classroom {
@@ -49,14 +47,18 @@ const Page = () => {
 
     const getClassRoom = async (): Promise<void> => {
         if (classroomId) {
-            const res = await axiosInstance().get(`/classroom?id=${classroomId}`);
-            const { startTime, endTime } = res.data.classroomDetails;
+            try {
+                const res = await axiosInstance().get(`/classroom?id=${classroomId}`);
+                const { startTime, endTime } = res.data.classroomDetails;
 
-            setClassRoom(res.data.classroomDetails);
+                setClassRoom(res.data.classroomDetails);
 
-            const start = parseTime(startTime);
-            const end = parseTime(endTime);
-            setRemainingTime(getTimeDifference(start, end));
+                const start = parseTime(startTime);
+                const end = parseTime(endTime);
+                setRemainingTime(getTimeDifference(start, end));
+            } catch (error) {
+                console.error("Failed to fetch classroom details:", error);
+            }
         }
     };
 
@@ -64,8 +66,9 @@ const Page = () => {
         const start = parseTime(newEntry.startTime);
         const end = parseTime(newEntry.endTime);
         const newDuration = getTimeDifference(start, end);
+
         if (remainingTime >= newDuration) {
-            setEntries([...entries, newEntry]);
+            setEntries(prevEntries => [...prevEntries, newEntry]);
             setRemainingTime(remainingTime - newDuration);
             setNewEntry({ day: '', subject: '', startTime: '', endTime: '' });
         } else {
@@ -73,12 +76,20 @@ const Page = () => {
         }
     };
 
-    const handleSubmit=async(e:React.FormEvent):Promise<void>=>{
-        const res=await axiosInstance().post(`/timetable?id=${classroomId}`,entries);
-        if(res.status==201){
-            console.log(entries)
+    const handleSubmit = async (): Promise<void> => {
+        if (classroomId) {
+            console.log("Submitting the following entries:", entries);
+            try {
+                const res = await axiosInstance().post(`/timetable?id=${classroomId}`, { entries });
+                if (res.status === 201) {
+                  
+                    setEntries([]);
+                }
+            } catch (error) {
+                console.error("Failed to submit timetable:", error);
+            }
         }
-    }
+    };
 
     useEffect(() => {
         getClassRoom();
@@ -100,7 +111,6 @@ const Page = () => {
 
             <div className='py-4'>
                 <div className='mb-4'>
-                    <form onSubmit={handleSubmit}>
                     <Input
                         placeholder="Day"
                         value={newEntry.day}
@@ -125,34 +135,44 @@ const Page = () => {
                         onChange={(e) => setNewEntry({ ...newEntry, endTime: e.target.value })}
                         className='mb-2'
                     />
-                    <Button onClick={handleAddEntry} disabled={remainingTime <= 0}>Add Entry</Button>
-                    </form>
+                    <Button type="button" onClick={handleAddEntry} disabled={remainingTime <= 0}>Add Entry</Button>
                 </div>
 
-                <Table className="w-full">
-    <TableHead>
-        <TableRow>
-            <TableCell className="text-left p-2">Day</TableCell>
-            <TableCell className="text-left p-2">Subject</TableCell>
-            <TableCell className="text-left p-2">Start Time</TableCell>
-            <TableCell className="text-left p-2">End Time</TableCell>
-        </TableRow>
-    </TableHead>
-    <TableBody>
-        {entries.map((entry, index) => (
-            <TableRow key={index}>
-                <TableCell className="text-left p-2">{entry.day}</TableCell>
-                <TableCell className="text-left p-2">{entry.subject}</TableCell>
-                <TableCell className="text-left p-2">{entry.startTime}</TableCell>
-                <TableCell className="text-left p-2">{entry.endTime}</TableCell>
-            </TableRow>
-        ))}
-    </TableBody>
-</Table>
 
+                <div className='w-full'>
+    <Table className="w-full border-collapse">
+        <TableHeader>
+            <TableRow>
+                <TableHead className="border p-2 font-bold">Day</TableHead>
+                <TableHead className="border p-2 font-bold">Subject</TableHead>
+                <TableHead className="border p-2 font-bold">Start Time</TableHead>
+                <TableHead className="border p-2 font-bold">End Time</TableHead>
+            </TableRow>
+        </TableHeader>
+        <TableBody>
+            {entries.length > 0 ? (
+                entries.map((entry, index) => (
+                    <TableRow key={index}>
+                        <TableCell className="border p-2">{entry.day}</TableCell>
+                        <TableCell className="border p-2">{entry.subject}</TableCell>
+                        <TableCell className="border p-2">{entry.startTime}</TableCell>
+                        <TableCell className="border p-2">{entry.endTime}</TableCell>
+                    </TableRow>
+                ))
+            ) : (
+                <TableRow>
+                    <TableCell colSpan={4} className="text-center p-2 border">
+                        No entries yet
+                    </TableCell>
+                </TableRow>
+            )}
+        </TableBody>
+    </Table>
+</div>
+                <Button type="button" onClick={handleSubmit} className='mt-4'>Submit Timetable</Button>
             </div>
         </div>
     );
-}
+};
 
 export default Page;

@@ -30,9 +30,9 @@ const Page = () => {
   const [currentStudent, setCurrentStudent] = useState<StudentDetail | null>(null);
 
   const getStudents = async (): Promise<void> => {
-    const res = await axiosInstance().get('/students');
+    const res = await axiosInstance().get('/get-all-students');
     console.log(res.data)
-    setStudents(res.data.allStudents);
+    setStudents(res.data.getAllStudents);
   }
 
   const handleCreateStudent = () => {

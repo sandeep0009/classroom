@@ -15,6 +15,7 @@ const authOptions: NextAuthOptions = {
       async authorize(credentials: any): Promise<any> {
         await dbConnect();
         try {
+          console.log(credentials.email,credentials.password)
           const user = await userModel.findOne({ email: credentials.email });
 
           if (!user) {

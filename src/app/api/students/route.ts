@@ -11,6 +11,7 @@ export async function POST(req:Request){
     try {
 
         const {email,password}=await req.json();
+   
 
 
         const studentExist=await userModel.findOne({email,role:'student'})
@@ -19,13 +20,13 @@ export async function POST(req:Request){
             return NextResponse.json({message:"student alreayd exist"},{status:400})
         }
 
-        const hashPassword=await bcrypt.hash(password,10)
-        const newStudent=await userModel.create(
-           { email,
-            hashPassword,
-            role:'student'
-        }
-        );
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        const newStudent = await userModel.create({
+            email,
+            password: hashedPassword, 
+            role: 'student'
+        });
 
         await newStudent.save();
         return NextResponse.json({message:"student created successfully",newStudent},{status:201});

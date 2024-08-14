@@ -1,55 +1,67 @@
+import { dbConnect } from "@/lib/dbConnect";
 import timetableModel from "@/models/timetableSchema";
 import { NextResponse } from "next/server";
 
 
-export async function POST(req:Request){
+export async function POST(req: Request) {
     try {
+        await dbConnect();
 
-        const url=new URL(req.url);
-        const id=url.searchParams.get('id');
+        const url = new URL(req.url);
+        const id = url.searchParams.get('id');
 
-        const {startTime,endTime,subject,day,}=await req.json();
-
-        const createTimeTable=await timetableModel.create({
-            subject,
-            endTime,
-            startTime,
-            day,
-            classroomId:id
-        })
-
-        await createTimeTable.save();
-
-
-        return NextResponse.json({message:'time table created successfully',createTimeTable},{status:201});
-        
-    } catch (error) {
-        console.log("error in creating timetable",error);
-        return NextResponse.json({messaeg:'error in creating timetable'},{status:404})
-        
-    }
-}
-
-
-export async function GET(req:Request){
-    try {
-
-        const url=new URL(req.url);
-        const id=url.searchParams.get('id');
-
-        const timeTableDetails=await timetableModel.find({classroomId:id});
-
-        if(!timeTableDetails){
-            return NextResponse.json({message:"it doesnt exist"},{status:400})
+        if (!id) {
+            return NextResponse.json({ message: 'Classroom ID is required' }, { status: 400 });
         }
 
-        return NextResponse.json({message:"all fetched time table details",timeTableDetails},{status:200});
-        
+        const body = await req.json();
+        console.log(body);
+
+        if (!Array.isArray(body.entries) || body.entries.length === 0) {
+            return NextResponse.json({ message: 'Entries array is required and must not be empty' }, { status: 400 });
+        }
+
+        const createdEntries = await Promise.all(body.entries.map(async (entry:any) => {
+            if (!entry.day || !entry.subject || !entry.startTime || !entry.endTime) {
+                throw new Error('Missing required fields in an entry');
+            }
+
+            return await timetableModel.create({
+                day: entry.day,
+                subject: entry.subject,
+                startTime: entry.startTime,
+                endTime: entry.endTime,
+                classroomId: id,
+            });
+        }));
+
+        return NextResponse.json({ message: 'Timetable entries created successfully', createdEntries }, { status: 201 });
     } catch (error) {
-        console.log("error in fetching time table",error);
-        return NextResponse.json({message:'error in fetching time table'},{status:404});
-        
+        console.error("Error in creating timetable:", error);
+        return NextResponse.json({ message: 'Error in creating timetable', error: error }, { status: 500 });
     }
 }
 
+export async function GET(req: Request) {
+    try {
+        await dbConnect();
 
+        const url = new URL(req.url);
+        const id = url.searchParams.get('id');
+
+        if (!id) {
+            return NextResponse.json({ message: 'Classroom ID is required' }, { status: 400 });
+        }
+
+        const timeTableDetails = await timetableModel.find({ classroomId: id });
+
+        if (timeTableDetails.length === 0) {
+            return NextResponse.json({ message: "No timetable found for this classroom" }, { status: 404 });
+        }
+
+        return NextResponse.json({ message: "Fetched all timetable details", timeTableDetails }, { status: 200 });
+    } catch (error) {
+        console.error("Error in fetching timetable:", error);
+        return NextResponse.json({ message: 'Error in fetching timetable', error: error }, { status: 500 });
+    }
+}
