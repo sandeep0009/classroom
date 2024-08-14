@@ -31,7 +31,7 @@ const Page = () => {
 
   useEffect(() => {
     fetchAllStudents();
-  }, []);
+  });
 
   return (
     <div className='flex flex-col m-auto max-w-xl justify-center  border border-grey-100 px-4 py-4 rounded-md mt-4'>

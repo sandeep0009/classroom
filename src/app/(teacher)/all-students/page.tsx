@@ -78,7 +78,7 @@ const Page = () => {
     }
   }
 
-  useEffect(() => { getAllStudents() }, []);
+  useEffect(() => { getAllStudents() });
 
   return (
     <div className='flex flex-col m-auto justify-center max-w-2xl py-4'>
