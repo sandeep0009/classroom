@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { axiosInstance } from '@/lib/axiosInstance';
 import React, {useState} from 'react'
+import { useToast } from "@/components/ui/use-toast"
 
 
 interface StudentDetail{
@@ -15,6 +16,7 @@ const Page = () => {
         password:''
 
     })
+    const { toast } = useToast()
 
     const previousPage=()=>{
         window.location.href='/students-edit'
@@ -30,7 +32,11 @@ const Page = () => {
         const res=await axiosInstance().post('/api/students',formData);
 
         if(res.status==201){
-            console.log(formData)
+            toast({
+                
+                description:'new student created successfully'
+            })
+          
         }
     }
   return (

@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { axiosInstance } from '@/lib/axiosInstance'
+import { useToast } from "@/components/ui/use-toast"
 
 interface StudentDetail {
   _id: string;
@@ -28,6 +29,7 @@ const Page = () => {
   const [students, setStudents] = useState<StudentDetail[]>([]);
   const [modal, setModal] = useState<boolean>(false);
   const [currentStudent, setCurrentStudent] = useState<StudentDetail | null>(null);
+  const { toast } = useToast()
 
   const getStudents =useCallback (async (): Promise<void> => {
     const res = await axiosInstance().get('/api/get-all-students');
@@ -66,6 +68,9 @@ const Page = () => {
   const deleteStudent = async (id: string): Promise<void> => {
     const res = await axiosInstance().delete(`/api/students?id=${id}`);
     if (res.status === 200) {
+      toast({
+        description:'student deleted successfully'
+      })
       getStudents();
     }
   }

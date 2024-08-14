@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button'
 import { axiosInstance } from '@/lib/axiosInstance'
+import { useToast } from "@/components/ui/use-toast"
 
 interface FormData {
     name: string;
@@ -40,6 +41,7 @@ const Page = () => {
         teacherId: "",
         studentIds: []
     });
+    const { toast } = useToast()
 
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [selectedTeacher, setSelectedTeacher] = useState<string>("");
@@ -74,9 +76,13 @@ const Page = () => {
     const handleCreateClassRoom = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
         try {
-            console.log(formData)
+           
             const response = await axiosInstance().post('/api/classroom', formData);
-            console.log("Classroom created:", response.data);
+           if(response.status==201){
+            toast({
+                description:'new Classroom created successfully'
+            })
+           }
             
         } catch (error) {
             console.error("Error creating classroom:", error);

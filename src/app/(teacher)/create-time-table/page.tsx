@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { axiosInstance } from '@/lib/axiosInstance';
 import { useSession } from 'next-auth/react';
+import { useToast } from "@/components/ui/use-toast"
 
 const parseTime = (timeStr: string) => {
     const [time, period] = timeStr.split(/(AM|PM)/);
@@ -44,6 +45,7 @@ const Page = () => {
     const [entries, setEntries] = useState<TimetableEntry[]>([]);
     const [newEntry, setNewEntry] = useState<TimetableEntry>({ day: '', subject: '', startTime: '', endTime: '' });
     const classroomId = session?.user?.classroomId;
+    const { toast } = useToast()
 
     const getClassRoom =useCallback( async (): Promise<void> => {
         if (classroomId) {
@@ -82,6 +84,9 @@ const Page = () => {
             try {
                 const res = await axiosInstance().post(`/api/timetable?id=${classroomId}`, { entries });
                 if (res.status === 201) {
+                    toast({
+                        description:'time table created successfully'
+                      })
                   
                     setEntries([]);
                 }
