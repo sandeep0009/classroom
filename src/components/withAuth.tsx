@@ -33,10 +33,7 @@ export function withAuth<P extends object>(WrappedComponent: ComponentType<P>) {
       }
     }, [session, status, router]);
 
-    if (status === 'loading' || !session) {
-      return <div>Loading...</div>;
-    }
-
+   
     return <WrappedComponent {...props} />;
   };
 
