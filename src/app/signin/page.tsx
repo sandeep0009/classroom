@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from '@/components/ui/button'
 import { signIn } from "next-auth/react";
-
+import { withAuth } from '@/components/withAuth';
 
 interface FormInterface {
   email: string,
@@ -73,4 +73,4 @@ const Page = () => {
   )
 }
 
-export default Page
+export default withAuth(Page)
