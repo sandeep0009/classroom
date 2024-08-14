@@ -53,3 +53,26 @@ export async function POST(req:Request){
         return NextResponse.json({message:"Error in creating classroom"},{status:500})
     }
 }
+
+
+
+export async function GET(req:Request){
+    try {
+
+        const url=new URL(req.url);
+        const id=url.searchParams.get('id');
+        const classroomDetails=await classroomModel.findById(id);
+
+        if(!classroomDetails){
+            return NextResponse.json({message:"error classroom doesnt exist"},{status:400});
+        }
+
+        return NextResponse.json({message:"details of classroom fetched successfully",classroomDetails},{status:200});
+        
+    } catch (error) {
+
+        console.log("error in the classroom fetching",error);
+        return NextResponse.json({message:"error in the fetching classroom" },{status:404})
+        
+    }
+}

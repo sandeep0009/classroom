@@ -75,7 +75,7 @@ const Page = () => {
         e.preventDefault();
         try {
             console.log(formData)
-            const response = await axiosInstance().post('/create-classroom', formData);
+            const response = await axiosInstance().post('/classroom', formData);
             console.log("Classroom created:", response.data);
             
         } catch (error) {
