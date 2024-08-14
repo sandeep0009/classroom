@@ -6,6 +6,7 @@ export interface Classroom extends Document{
     endTime:string;
     daysInSession:string[];
     teacherId?:mongoose.Schema.Types.ObjectId;
+    studentIds?: mongoose.Schema.Types.ObjectId[];
 }
 
 
@@ -17,7 +18,11 @@ const classroomSchema:Schema<Classroom>=new mongoose.Schema({
     teacherId: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: "User" 
-    }
+    },
+    studentIds: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",  
+    }],
   }, { timestamps: true }
 )
 

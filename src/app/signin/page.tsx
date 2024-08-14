@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from '@/components/ui/button'
 import { signIn } from "next-auth/react";
 
+
 interface FormInterface {
   email: string,
   password: string
@@ -14,6 +15,7 @@ const Page = () => {
     email: "",
     password: ""
   })
+
 
   const handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -27,14 +29,17 @@ const Page = () => {
       email: formData.email,
       password: formData.password,
     });
-    console.log(result)
+   
     if (result?.error) {
       console.log(result.error);
     }
+    
+   
+     
   }
 
   return (
-    <div className="flex items-center justify-center  bg-gray-100 p-11">
+    <div className="flex items-center justify-center p-11">
       <div className="w-96 max-w-xl p-8 bg-white rounded-lg shadow-lg">
         <h2 className="mb-6 text-2xl font-bold text-center text-gray-800">
           Login to ClassRoom

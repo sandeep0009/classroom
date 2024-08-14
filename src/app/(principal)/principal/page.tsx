@@ -4,7 +4,7 @@ import React from 'react';
 const Page = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+   
 
       <div className="flex flex-col justify-center max-w-6xl m-auto py-8 px-4">
         <div className="text-3xl font-semibold text-center text-gray-800 mb-6">
