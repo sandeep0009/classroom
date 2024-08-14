@@ -2,8 +2,13 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, ComponentType } from 'react';
 
+interface Session {
+  user: {
+    role: 'principal' | 'teacher' | 'student';
+  };
+}
 
-export function withAuth<P extends Record<string, unknown>>(WrappedComponent: ComponentType<P>) {
+export function withAuth<P extends object>(WrappedComponent: ComponentType<P>) {
   const AuthWrapper = (props: P) => {
     const { data: session, status } = useSession();
     const router = useRouter();
@@ -28,7 +33,7 @@ export function withAuth<P extends Record<string, unknown>>(WrappedComponent: Co
       }
     }, [session, status, router]);
 
-    if (status === 'loading' || session) {
+    if (status === 'loading' || !session) {
       return <div>Loading...</div>;
     }
 
