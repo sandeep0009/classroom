@@ -1,11 +1,19 @@
 import { dbConnect } from "@/lib/dbConnect";
+import { rateLimiter } from "@/lib/redisLimiter";
+
 import classroomModel from "@/models/classroomSchema";
 import userModel from "@/models/userSchema";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 dbConnect()
-export async function POST(req:Request){
+export async function POST(req:NextRequest){
     try {
+
+        const limitResult = await rateLimiter(req);
+        if (limitResult){
+            return limitResult;
+        }
+
         const {name, startTime, endTime, daysInSession, teacherId,studentIds} = await req.json();
         if(!(name || startTime || endTime || daysInSession || teacherId || studentIds)){
             return NextResponse.json({message:"Error: provide all required fields"},{status:400})

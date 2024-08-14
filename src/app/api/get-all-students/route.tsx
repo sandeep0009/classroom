@@ -1,9 +1,15 @@
 import userModel from "@/models/userSchema";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { rateLimiter } from "@/lib/redisLimiter";
 
 
-export async function GET(req:Request){
+export async function GET(req:NextRequest){
     try {
+
+        const limitResult = await rateLimiter(req);
+        if (limitResult){
+            return limitResult;
+        }
 
         const getAllStudents=await userModel.find({role:'student'});
 

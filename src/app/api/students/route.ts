@@ -1,7 +1,8 @@
 import { dbConnect } from "@/lib/dbConnect";
 import userModel from "@/models/userSchema";
-import {  NextResponse } from "next/server";
+import {  NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs"
+import { rateLimiter } from "@/lib/redisLimiter";
 
 
 
@@ -11,9 +12,6 @@ export async function POST(req:Request){
     try {
 
         const {email,password}=await req.json();
-   
-
-
         const studentExist=await userModel.findOne({email,role:'student'})
 
         if(studentExist){
@@ -38,8 +36,12 @@ export async function POST(req:Request){
         
     }
 }
-export async function GET(req: Request){
+export async function GET(req: NextRequest){
     try {
+        const limitResult = await rateLimiter(req);
+        if (limitResult){
+            return limitResult;
+        }
         const url = new URL(req.url);
         const id = url.searchParams.get('id');
         const allStudents = await userModel.find({ classroomId:id ,role:'student'});
@@ -52,8 +54,12 @@ export async function GET(req: Request){
     }
 }
 
-export async function DELETE(req:Request){
+export async function DELETE(req:NextRequest){
     try {
+        const limitResult = await rateLimiter(req);
+        if (limitResult){
+            return limitResult;
+        }
         const url = new URL(req.url);
         const id = url.searchParams.get('id');
        
@@ -69,8 +75,12 @@ export async function DELETE(req:Request){
 
 
 
-export async function PATCH(req:Request){
+export async function PATCH(req:NextRequest){
     try {
+        const limitResult = await rateLimiter(req);
+        if (limitResult){
+            return limitResult;
+        }
 
         const url = new URL(req.url);
         const id = url.searchParams.get('id');
