@@ -15,8 +15,8 @@ const Navbar: React.FC = () => {
   const principalNavItems: NavItem[] = [
     { name: 'Create Classroom', link: '/create-classroom' },
     { name: 'Teachers', link: '/teachers-edit' },
-    { name: 'Students', link: '/students-edit' },
-    { name: 'All Time Table', link: '/all-time-table' },
+    { name: 'Students', link: '/students-edit' }
+ 
   ];
 
   const studentNavItems: NavItem[] = [
