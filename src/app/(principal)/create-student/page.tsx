@@ -27,7 +27,7 @@ const Page = () => {
 
     const handleFormData=async(e:React.FormEvent):Promise<void>=>{
         e.preventDefault();
-        const res=await axiosInstance().post('/students',formData);
+        const res=await axiosInstance().post('/api/students',formData);
 
         if(res.status==201){
             console.log(formData)

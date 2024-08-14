@@ -41,7 +41,7 @@ const Page = () => {
   const getAllStudents = useCallback(async (): Promise<void> => {
    
     if (classroomId) {
-      const res = await axiosInstance().get(`/students?id=${classroomId}`);
+      const res = await axiosInstance().get(`/api/students?id=${classroomId}`);
       console.log(res)
       setStudents(res.data.allStudents);
     }
@@ -56,7 +56,7 @@ const Page = () => {
   }
 
   const deleteStudent = async (id: string): Promise<void> => {
-    const res = await axiosInstance().delete(`/students?id=${id}`);
+    const res = await axiosInstance().delete(`/api/students?id=${id}`);
     if (res.status === 200) {
       getAllStudents();
     }
@@ -70,7 +70,7 @@ const Page = () => {
   const handleUpdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentStudent) {
-      const res = await axiosInstance().patch(`/students?id=${currentStudent._id}`, currentStudent);
+      const res = await axiosInstance().patch(`/api/students?id=${currentStudent._id}`, currentStudent);
       if (res.status === 200) {
         getAllStudents();
         handleModalClose();

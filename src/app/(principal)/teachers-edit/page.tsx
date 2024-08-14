@@ -37,7 +37,9 @@ const Page = () => {
   }
 
   const getAllTeachers =useCallback (async (): Promise<void> => {
-    const res = await axiosInstance().get('/teachers');
+
+    const res = await axiosInstance().get('/api/teachers');
+   
     setAllTeachers(res.data.getAllTeachers);
   },[])
 
@@ -50,7 +52,7 @@ const Page = () => {
   }
 
   const deleteTeacher = async (id: string): Promise<void> => {
-    const res = await axiosInstance().delete(`/teachers?id=${id}`);
+    const res = await axiosInstance().delete(`/api/teachers?id=${id}`);
     if (res.status === 200) {
       getAllTeachers();
     }
@@ -64,7 +66,7 @@ const Page = () => {
   const handleUpdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentTeacher) {
-      const res = await axiosInstance().patch(`/teachers?id=${currentTeacher._id}`, currentTeacher);
+      const res = await axiosInstance().patch(`/api/teachers?id=${currentTeacher._id}`, currentTeacher);
       if (res.status === 200) {
         getAllTeachers();
         handleModalClose();

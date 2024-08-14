@@ -52,7 +52,7 @@ const Page = () => {
 
     const getTeachers = async (): Promise<void> => {
         try {
-            const res = await axiosInstance().get('/teachers');
+            const res = await axiosInstance().get('/api/teachers');
             setTeachers(res.data.getAllTeachers.map((teacher: any) => ({
                 id: teacher._id,
                 email: teacher.email
@@ -63,7 +63,7 @@ const Page = () => {
     }
 
     const getStudents=async():Promise<void>=>{
-       const res= await axiosInstance().get('/get-all-students');
+       const res= await axiosInstance().get('/api/get-all-students');
        setStudents(res.data.getAllStudents.map((student: any) => ({
         id: student._id,
         email: student.email
@@ -75,7 +75,7 @@ const Page = () => {
         e.preventDefault();
         try {
             console.log(formData)
-            const response = await axiosInstance().post('/classroom', formData);
+            const response = await axiosInstance().post('/api/classroom', formData);
             console.log("Classroom created:", response.data);
             
         } catch (error) {

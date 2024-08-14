@@ -48,7 +48,7 @@ const Page = () => {
     const getClassRoom =useCallback( async (): Promise<void> => {
         if (classroomId) {
             try {
-                const res = await axiosInstance().get(`/classroom?id=${classroomId}`);
+                const res = await axiosInstance().get(`/api/classroom?id=${classroomId}`);
                 const { startTime, endTime } = res.data.classroomDetails;
 
                 setClassRoom(res.data.classroomDetails);
@@ -80,7 +80,7 @@ const Page = () => {
         if (classroomId) {
             console.log("Submitting the following entries:", entries);
             try {
-                const res = await axiosInstance().post(`/timetable?id=${classroomId}`, { entries });
+                const res = await axiosInstance().post(`/api/timetable?id=${classroomId}`, { entries });
                 if (res.status === 201) {
                   
                     setEntries([]);

@@ -24,7 +24,7 @@ const Page = () => {
 
   const fetchAllStudents = useCallback(async (): Promise<void> => {
     if (classRoomId) {
-      const res = await axiosInstance().get(`/students?id=${classRoomId}`);
+      const res = await axiosInstance().get(`/api/students?id=${classRoomId}`);
       setStudents(res.data.allStudents); 
     }
   },[classRoomId])

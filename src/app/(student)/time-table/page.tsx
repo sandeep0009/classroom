@@ -26,7 +26,7 @@ const Page = () => {
     const getTimeTable = useCallback(async (): Promise<void> => {
         if (classRoomId) {
             try {
-                const res = await axiosInstance().get(`/timetable?id=${classRoomId}`);
+                const res = await axiosInstance().get(`/api/timetable?id=${classRoomId}`);
                 console.log(res.data)
                 
                 setTimetable(res.data.timeTableDetails); 
