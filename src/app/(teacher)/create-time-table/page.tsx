@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
     Table,
     TableBody,
@@ -45,7 +45,7 @@ const Page = () => {
     const [newEntry, setNewEntry] = useState<TimetableEntry>({ day: '', subject: '', startTime: '', endTime: '' });
     const classroomId = session?.user?.classroomId;
 
-    const getClassRoom = async (): Promise<void> => {
+    const getClassRoom =useCallback( async (): Promise<void> => {
         if (classroomId) {
             try {
                 const res = await axiosInstance().get(`/classroom?id=${classroomId}`);
@@ -60,7 +60,7 @@ const Page = () => {
                 console.error("Failed to fetch classroom details:", error);
             }
         }
-    };
+    },[classroomId])
 
     const handleAddEntry = () => {
         const start = parseTime(newEntry.startTime);
@@ -93,7 +93,7 @@ const Page = () => {
 
     useEffect(() => {
         getClassRoom();
-    }, [classroomId]);
+    }, [getClassRoom]);
 
     return (
         <div className='flex flex-col max-w-xl justify-center m-auto py-4 border border-grey-100 rounded-md px-4 mt-3'>

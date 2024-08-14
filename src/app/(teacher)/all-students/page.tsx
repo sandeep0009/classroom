@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { axiosInstance } from '@/lib/axiosInstance'
 import {
@@ -38,14 +38,14 @@ const Page = () => {
   const [modal, setModal] = useState<boolean>(false);
   const [currentStudent, setCurrentStudent] = useState<StudentDetails | null>(null);
 
-  const getAllStudents = async (): Promise<void> => {
-    console.log(classroomId)
+  const getAllStudents = useCallback(async (): Promise<void> => {
+   
     if (classroomId) {
       const res = await axiosInstance().get(`/students?id=${classroomId}`);
       console.log(res)
       setStudents(res.data.allStudents);
     }
-  }
+  },[classroomId])
 
   const updateStudent = async (id: string): Promise<void> => {
     const student = students.find((student) => student._id === id);
@@ -78,7 +78,7 @@ const Page = () => {
     }
   }
 
-  useEffect(() => { getAllStudents() });
+  useEffect(() => { getAllStudents() },[getAllStudents]);
 
   return (
     <div className='flex flex-col m-auto justify-center max-w-2xl py-4'>

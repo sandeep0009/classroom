@@ -1,7 +1,7 @@
 "use client"
 import { axiosInstance } from '@/lib/axiosInstance'
 import { useSession } from 'next-auth/react'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   Table,
   TableBody,
@@ -22,16 +22,16 @@ const Page = () => {
   const classRoomId = session?.user?.classroomId;
   const [students, setStudents] = useState<Student[]>([]);
 
-  const fetchAllStudents = async (): Promise<void> => {
+  const fetchAllStudents = useCallback(async (): Promise<void> => {
     if (classRoomId) {
       const res = await axiosInstance().get(`/students?id=${classRoomId}`);
       setStudents(res.data.allStudents); 
     }
-  }
+  },[classRoomId])
 
   useEffect(() => {
     fetchAllStudents();
-  });
+  },[fetchAllStudents]);
 
   return (
     <div className='flex flex-col m-auto max-w-xl justify-center  border border-grey-100 px-4 py-4 rounded-md mt-4'>

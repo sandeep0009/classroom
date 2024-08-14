@@ -1,6 +1,6 @@
 "use client"
 import { Button } from '@/components/ui/button'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   Table,
   TableBody,
@@ -29,12 +29,12 @@ const Page = () => {
   const [modal, setModal] = useState<boolean>(false);
   const [currentStudent, setCurrentStudent] = useState<StudentDetail | null>(null);
 
-  const getStudents = async (): Promise<void> => {
+  const getStudents =useCallback (async (): Promise<void> => {
     const res = await axiosInstance().get('/get-all-students');
     console.log(res.data)
     setStudents(res.data.getAllStudents);
-  }
-
+  },[]
+)
   const handleCreateStudent = () => {
     window.location.href = '/create-student';
   }
@@ -72,7 +72,7 @@ const Page = () => {
 
   useEffect(() => {
     getStudents();
-  }, [])
+  }, [getStudents])
 
   return (
     <div className='flex flex-col max-w-xl m-auto justify-center py-4'>

@@ -1,6 +1,6 @@
 "use client"
 import { Button } from '@/components/ui/button'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   Table,
   TableBody,
@@ -36,10 +36,10 @@ const Page = () => {
 
   }
 
-  const getAllTeachers = async (): Promise<void> => {
+  const getAllTeachers =useCallback (async (): Promise<void> => {
     const res = await axiosInstance().get('/teachers');
     setAllTeachers(res.data.getAllTeachers);
-  }
+  },[])
 
   const updateTeacher = async (id: string): Promise<void> => {
     const teacher = allTeachers.find((teacher) => teacher._id === id);
@@ -72,7 +72,7 @@ const Page = () => {
     }
   }
 
-  useEffect(() => { getAllTeachers() }, []);
+  useEffect(() => { getAllTeachers() }, [getAllTeachers]);
 
   return (
     <div className='flex flex-col m-auto justify-center max-w-2xl py-4 '>

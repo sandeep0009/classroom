@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { axiosInstance } from '@/lib/axiosInstance';
 import {
@@ -23,7 +23,7 @@ const Page = () => {
     const [timetable, setTimetable] = useState<TimetableEntry[]>([]);
     const classRoomId = session?.user?.classroomId;
 
-    const getTimeTable = async (): Promise<void> => {
+    const getTimeTable = useCallback(async (): Promise<void> => {
         if (classRoomId) {
             try {
                 const res = await axiosInstance().get(`/timetable?id=${classRoomId}`);
@@ -34,11 +34,11 @@ const Page = () => {
                 console.error("Failed to fetch timetable:", error);
             }
         }
-    };
+    },[classRoomId]);
 
     useEffect(() => {
         getTimeTable();
-    }, []);
+    },[getTimeTable]);
 
     return (
         <div className="flex flex-col max-w-xl justify-center m-auto py-4 border border-grey-100 rounded-md px-4 mt-3">
@@ -58,7 +58,7 @@ const Page = () => {
   </TableHeader>
   <TableBody>
     {timetable.map((entry, index) => (
-      <TableRow >
+      <TableRow key={index}>
         <TableCell >{entry.day}</TableCell>
         <TableCell >{entry.subject}</TableCell>
         <TableCell >{entry.startTime}</TableCell>
