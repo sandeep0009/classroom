@@ -38,7 +38,7 @@ const Page = () => {
 
     useEffect(() => {
         getTimeTable();
-    }, [classRoomId]);
+    }, []);
 
     return (
         <div className="flex flex-col max-w-xl justify-center m-auto py-4 border border-grey-100 rounded-md px-4 mt-3">
