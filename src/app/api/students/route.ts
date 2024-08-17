@@ -11,7 +11,7 @@ dbConnect()
 export async function POST(req:Request){
     try {
 
-        const {email,password}=await req.json();
+        const {name,email,password}=await req.json();
         const studentExist=await userModel.findOne({email,role:'student'})
 
         if(studentExist){
@@ -21,6 +21,7 @@ export async function POST(req:Request){
         const hashedPassword = await bcrypt.hash(password, 10);
         
         const newStudent = await userModel.create({
+            name,
             email,
             password: hashedPassword, 
             role: 'student'
@@ -38,14 +39,42 @@ export async function POST(req:Request){
 }
 export async function GET(req: NextRequest){
     try {
+
         const limitResult = await rateLimiter(req);
         if (limitResult){
             return limitResult;
         }
         const url = new URL(req.url);
+        
         const id = url.searchParams.get('id');
-        const allStudents = await userModel.find({ classroomId:id ,role:'student'});
-        return NextResponse.json({message:'all students are here',allStudents},{status:200})
+        const page=parseInt(url.searchParams.get('page') || '1',10);
+        const limit=parseInt(url.searchParams.get('page') || '5',10);
+
+        const skip=(page-1)*limit;
+
+        const searchQuery=url.searchParams.get('search') || '';
+        const filter={
+            classroomId:id,
+            role:'student',
+            $or:[
+                {name:{$regex:searchQuery,$options:'i'}},
+                {email:{$regex:searchQuery,$options:'i'}}
+            ]
+
+        }
+
+        const totalStudents=await userModel.countDocuments(filter);
+        const allStudents = await userModel.find(filter).skip(skip).limit(limit);
+        return NextResponse.json({message:'all students are here',
+            data:allStudents,
+            pagination:{
+                totalStudents,
+                page,
+                limit,
+                totalPages:Math.ceil(totalStudents/limit)
+            }
+        
+        },{status:200})
         
     } catch (error) {
         console.log('error in get the route of students',error);

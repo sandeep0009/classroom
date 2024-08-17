@@ -9,14 +9,18 @@ export async function POST(req: Request) {
         const data = await req.json();
 
     
-        const { email, password, role } = data;
+        const {name, email, password, role } = data;
+        console.log(name, email, password, role)
 
-        if (!email || !password || !role) {
+        if (!name||!email || !password || !role) {
             return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
         }
 
    
         const userExist = await userModel.findOne({ email });
+        const userSchema = userModel.schema;
+
+        console.log(userSchema);
 
         if (userExist) {
             return NextResponse.json({ message: "Email already exists" }, { status: 409 });
@@ -27,6 +31,7 @@ export async function POST(req: Request) {
 
      
         const newUser = await userModel.create({
+            name,
             email,
             password: hashedPassword,
             role

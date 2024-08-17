@@ -7,11 +7,13 @@ import { useToast } from "@/components/ui/use-toast"
 
 
 interface StudentDetail{
+    name:string;
     email:string;
     password:string;
 }
 const Page = () => {
     const[formData,setFormData]=useState<StudentDetail>({
+        name:'',
         email:'',
         password:''
 
@@ -51,6 +53,14 @@ const Page = () => {
         </div>
 
         <form onSubmit={handleFormData}>
+
+        <div className="mb-3">
+            <Input 
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder='enter the name of new Student'/>
+        </div>
 
         <div className="mb-3">
             <Input 

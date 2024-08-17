@@ -11,9 +11,38 @@ export async function GET(req:NextRequest){
             return limitResult;
         }
 
-        const getAllStudents=await userModel.find({role:'student'});
+        const url=new URL(req.url);
+        const page=parseInt(url.searchParams.get('page')||'1',10);
+        const limit=parseInt(url.searchParams.get('limit')||'5',10);
+        const skip=(page-1)*limit;
 
-        return NextResponse.json({message:'all students fetched successfully',getAllStudents},{status:200})
+        const searchQuery=url.searchParams.get('search') || '';
+        console.log(searchQuery)
+
+        const filter={
+            role:'student',
+            $or:[
+                {name:{$regex:searchQuery,$options:'i'}},
+                {email:{$regex:searchQuery,$options:'i'}}
+
+            ]
+        }
+
+        const totalStudents=await userModel.countDocuments(filter);
+        const getAllStudents=await userModel.find(filter).skip(skip).limit(limit);
+
+        return NextResponse.json({message:'all students fetched successfully',
+            data:getAllStudents,
+            pagination:{
+                totalStudents,
+                page,
+                limit,
+                totalPages:Math.ceil(totalStudents/limit)
+            }
+        
+        },
+            {status:200}
+        )
         
     } catch (error) {
         console.log("error in fetching all students",error);

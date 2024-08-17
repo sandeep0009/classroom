@@ -10,7 +10,7 @@ import { dbConnect } from "@/lib/dbConnect";
 dbConnect()
 export async function POST(req: NextRequest) {
     try {
-        const { email, password } = await req.json();
+        const { email, password,name } = await req.json();
         
         
         let teacherExist = await userModel.findOne({ email, role: 'teacher' });
@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
         
         const hashPassword = await bcrypt.hash(password, 10);
         const newTeacher = await userModel.create({
+            name,
             email,
             password: hashPassword,
             role:'teacher'
@@ -37,10 +38,34 @@ export async function POST(req: NextRequest) {
 export async function GET(req:NextRequest){
     try {
 
+        const url=new URL(req.url);
+        const page=parseInt(url.searchParams.get('page')||'1',10);
+        const limit=parseInt(url.searchParams.get('limit')|| '5',10)
+        const skip=(page-1)*limit;
+        const searchQuery=url.searchParams.get('search') || '';
 
-        const getAllTeachers=await userModel.find({role:'teacher'});
+        const filter={
+            role:'teacher',
+            $or:[
+                {name:{$regex:searchQuery,$options:'i'}},
+                {email:{$regex:searchQuery,$options:'i'}}
+            ]
+        }
+        const totalTeacher=await userModel.countDocuments(filter);
+        const getAllTeachers=await userModel.find(filter).skip(skip).limit(limit);
 
-        return NextResponse.json({message:"all teacher details are here",getAllTeachers},{status:201});
+        return NextResponse.json({message:"all teacher details are here",
+            data:getAllTeachers,
+            pagination:{
+                total:totalTeacher,
+                page,
+                limit,
+                totalPages:Math.ceil(totalTeacher/limit)
+
+            }
+        },
+        {status:201}
+    );
 
         
     } catch (error) {

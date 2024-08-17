@@ -27,6 +27,7 @@ const authOptions: NextAuthOptions = {
           
             return {
               id: user.id.toString(),
+              name:user.name,
               email: user.email,
               role: user.role,
               classroomId: user.classroomId?.toString() 
@@ -45,6 +46,7 @@ const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token._id = user.id;
+        token.name=user.name;
         token.email = user.email;
         token.role = user.role;
         token.classroomId = user.classroomId;
@@ -54,6 +56,7 @@ const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user._id = token._id;
+        session.user.name=token.name;
         session.user.email = token.email;
         session.user.role = token.role;
         session.user.classroomId = token.classroomId;

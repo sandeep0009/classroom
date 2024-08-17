@@ -7,11 +7,13 @@ import { useToast } from "@/components/ui/use-toast"
 
 
 interface TeacherDetail{
+    name:string;
     email:string;
     password:string;
 }
 const Page = () => {
     const[formData,setFormData]=useState<TeacherDetail>({
+        name:'',
         email:'',
         password:''
 
@@ -30,6 +32,7 @@ const Page = () => {
     const handleFormData=async(e:React.FormEvent):Promise<void>=>{
         e.preventDefault();
         const res=await axiosInstance().post('/api/teachers',formData);
+        
 
         if(res.status==201){
             toast({
@@ -49,6 +52,14 @@ const Page = () => {
         </div>
 
         <form onSubmit={handleFormData}>
+
+        <div className="mb-3">
+            <Input 
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder='enter the name of new Teacher'/>
+        </div>
 
         <div className="mb-3">
             <Input 

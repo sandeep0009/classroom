@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { axiosInstance } from '@/lib/axiosInstance'
 import {
@@ -19,9 +19,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import CustomPagination from '@/components/Pagination'
+
+import { Input } from '@/components/ui/input'
+import { debounce } from 'lodash'
 
 interface StudentDetails {
-  _id: string
+  _id: string;
+  name:string;
   email: string;
   password: string;
 }
@@ -29,21 +34,21 @@ interface StudentDetails {
 const Page = () => {
   const { data: session } = useSession();
   const classroomId = session?.user?.classroomId; 
-
-  console.log(session?.user)
-
-  console.log(session?.user?.classroomId)
-
   const [students, setStudents] = useState<StudentDetails[]>([]);
   const [modal, setModal] = useState<boolean>(false);
   const [currentStudent, setCurrentStudent] = useState<StudentDetails | null>(null);
+  const [currentPage,setCurrentPage]=useState<number>(1);
+  const [totalPage,setTotalPage]=useState<number>(1);
+  const limit=5;
+  const [searchQuery,setSearchQuery]=useState<string>('')
 
-  const getAllStudents = useCallback(async (): Promise<void> => {
+
+  const getAllStudents = useCallback(async (page:number,query:string=''): Promise<void> => {
    
     if (classroomId) {
-      const res = await axiosInstance().get(`/api/students?id=${classroomId}`);
-      console.log(res)
-      setStudents(res.data.allStudents);
+      const res = await axiosInstance().get(`/api/students?id=${classroomId}`,{params:{page,limit,search:query}});
+      setTotalPage(res.data.pagination.totalPages)
+      setStudents(res.data.data);
     }
   },[classroomId])
 
@@ -58,7 +63,7 @@ const Page = () => {
   const deleteStudent = async (id: string): Promise<void> => {
     const res = await axiosInstance().delete(`/api/students?id=${id}`);
     if (res.status === 200) {
-      getAllStudents();
+      getAllStudents(currentPage);
     }
   }
 
@@ -72,19 +77,35 @@ const Page = () => {
     if (currentStudent) {
       const res = await axiosInstance().patch(`/api/students?id=${currentStudent._id}`, currentStudent);
       if (res.status === 200) {
-        getAllStudents();
+        getAllStudents(currentPage);
         handleModalClose();
       }
     }
   }
 
-  useEffect(() => { getAllStudents() },[getAllStudents]);
+  const handlePageChange=(page:number)=>{
+    setCurrentPage(page)
+   
+  }
+  const debouncedSearch = useMemo(
+    () => debounce((query: string) => {
+      setSearchQuery(query);
+    }, 300),
+    []
+  );
+
+  useEffect(() => { getAllStudents(currentPage,searchQuery) },[getAllStudents,currentPage,searchQuery]);
 
   return (
     <div className='flex flex-col m-auto justify-center max-w-2xl py-4'>
-      <div className='mb-4'>
+      <div className='mb-4 flex justify-between m-auto space-x-5'>
         <div className='text-2xl font-bold text-left'>
-          Students in Your Classroom
+          Students in Your Class
+        </div>
+        <div className='w-96'>
+          <Input
+          onChange={(e) => debouncedSearch(e.target.value)}
+          placeholder='Search for your student e.g name or email'/>
         </div>
       </div>
 
@@ -93,6 +114,7 @@ const Page = () => {
           <TableHeader>
             <TableRow>
               <TableHead>S.No</TableHead>
+              <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -102,6 +124,7 @@ const Page = () => {
             {students.map((student, index) => (
               <TableRow key={student._id}>
                 <TableCell>{index + 1}</TableCell>
+                <TableCell>{student.name}</TableCell>
                 <TableCell>{student.email}</TableCell>
                 <TableCell>
                   <Button variant="outline" size="sm" onClick={() => updateStudent(student._id)}>Edit</Button>
@@ -111,6 +134,10 @@ const Page = () => {
             ))}
           </TableBody>
         </Table>
+      </div>
+
+      <div>
+        <CustomPagination totalPage={totalPage} currentPage={currentPage} onPageChange={handlePageChange}/>
       </div>
 
       {modal && currentStudent && (
@@ -129,6 +156,15 @@ const Page = () => {
                   type="email"
                   value={currentStudent.email}
                   onChange={(e) => setCurrentStudent({ ...currentStudent, email: e.target.value })}
+                  className="w-full border p-2"
+                />
+              </div>
+              <div className='mb-4'>
+                <label>Name:</label>
+                <input
+                  type="name"
+                  value={currentStudent.name}
+                  onChange={(e) => setCurrentStudent({ ...currentStudent, name: e.target.value })}
                   className="w-full border p-2"
                 />
               </div>

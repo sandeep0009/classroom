@@ -55,7 +55,7 @@ const Page = () => {
     const getTeachers = async (): Promise<void> => {
         try {
             const res = await axiosInstance().get('/api/teachers');
-            setTeachers(res.data.getAllTeachers.map((teacher: any) => ({
+            setTeachers(res.data.data.map((teacher: any) => ({
                 id: teacher._id,
                 email: teacher.email
             })));
@@ -66,10 +66,14 @@ const Page = () => {
 
     const getStudents=async():Promise<void>=>{
        const res= await axiosInstance().get('/api/get-all-students');
-       setStudents(res.data.getAllStudents.map((student: any) => ({
-        id: student._id,
-        email: student.email
-    })));
+      
+       if(res.data.data.length>0){
+
+           setStudents(res.data.data.map((student: any) => ({
+            id: student._id,
+            email: student.email
+        })));
+       }
 
     }
 
